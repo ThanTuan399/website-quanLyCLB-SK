@@ -1,5 +1,4 @@
-// --- Bước 2.4: Viết Logic (Controller) ---
-// Đây là nơi xử lý logic nghiệp vụ chính của việc Đăng ký và Đăng nhập
+// --- File này chứa logic nghiệp vụ chính của việc Đăng ký và Đăng nhập ---
 
 // Import các "phụ tùng" cần thiết
 const User = require('../models/user.model'); // Import Model User
@@ -15,12 +14,11 @@ exports.register = async (req, res) => {
     // 1. Kiểm tra xem email đã tồn tại chưa
     const existingUser = await User.findOne({ where: { email } });
     if (existingUser) {
-      // Nếu email đã có, trả về lỗi 400
+      // Nếu email đã có, trả về lỗi 400 (Bad Request)
       return res.status(400).json({ message: "Email đã tồn tại." });
     }
 
     // 2. Mã hóa mật khẩu
-    // "salt" là một chuỗi ngẫu nhiên để tăng độ bảo mật
     const salt = await bcrypt.genSalt(10);
     const hashedMatKhau = await bcrypt.hash(matKhau, salt);
 
@@ -30,10 +28,10 @@ exports.register = async (req, res) => {
       email,
       matKhau: hashedMatKhau, // Lưu mật khẩu đã mã hóa
       mssv,
-      vaiTro
+      vaiTro // Dùng vaiTro được cung cấp, hoặc mặc định (đã set trong Model)
     });
 
-    // 4. Trả về thông báo thành công
+    // 4. Trả về thông báo thành công (201 Created)
     res.status(201).json({ message: "Tạo tài khoản thành công!", userId: newUser.userId });
 
   } catch (error) {
@@ -53,12 +51,10 @@ exports.login = async (req, res) => {
     const user = await User.findOne({ where: { email } });
     if (!user) {
       // Nếu không tìm thấy, trả lỗi 404 (Not Found)
-      return res.status(404).json({ message: "Không tìm thấy người dùng. Sai email hoặc mật khẩu." });
+      return res.status(404).json({ message: "Sai email hoặc mật khẩu." });
     }
 
     // 2. So sánh mật khẩu
-    // Dùng bcrypt.compare để so sánh mật khẩu người dùng nhập (matKhau)
-    // với mật khẩu đã mã hóa trong CSDL (user.matKhau)
     const isMatch = await bcrypt.compare(matKhau, user.matKhau);
     if (!isMatch) {
       // Nếu mật khẩu sai, trả lỗi 401 (Unauthorized)
@@ -66,17 +62,16 @@ exports.login = async (req, res) => {
     }
 
     // 3. Tạo JSON Web Token (JWT)
-    // Tạo một "payload" (gói tin) chứa thông tin của user
     const payload = {
       userId: user.userId,
       email: user.email,
       vaiTro: user.vaiTro
     };
 
-    // Ký (sign) token với một "chìa khóa bí mật" (secret key)
-    // (Lưu ý: "YOUR_SECRET_KEY" này nên được cất trong file .env, nhưng để đơn giản ta để ở đây)
+    // Ký (sign) token với một "chìa khóa bí mật"
+    // LƯU Ý: 'YOUR_SECRET_KEY' phải được bảo mật, không bao giờ code cứng
     const token = jwt.sign(payload, 'YOUR_SECRET_KEY', {
-      expiresIn: '2h' // Token sẽ hết hạn sau 2 giờ
+      expiresIn: '2h' // Token hết hạn sau 2 giờ
     });
 
     // 4. Trả về token cho người dùng

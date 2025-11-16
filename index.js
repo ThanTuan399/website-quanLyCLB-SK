@@ -1,26 +1,47 @@
-// 1. IMPORT CÁC THƯ VIỆN
-// import (require)
-const {sequelize, testConnection } = require('./src/config/database');
-// "Import" thư viện Express
-const express = require('express'); 
-const authRoutes = require('./src/routes/auth.route.js');
+// --- BƯỚC 1: IMPORT CÁC THƯ VIỆN CẦN THIẾT ---
 
-// 2. CẤU HÌNH ỨNG DỤNG 
-const app= express();
-const PORT= 3000;
-// đọc JSON mà Postman gửi lên
+// LUÔN LUÔN import (require) file CSDL đầu tiên để tránh lỗi Vòng lặp
+const { testConnection } = require('./src/config/database');
+
+// Import thư viện Express
+const express = require('express');
+
+// Import file routes bạn vừa tạo
+const authRoutes = require('./src/routes/auth.route'); 
+
+// --- BƯỚC 2: CẤU HÌNH ỨNG DỤNG (APP) ---
+const app = express();
+const PORT = 3000;
+
+// --- Middlewares (Phần mềm trung gian) ---
+// Dạy cho Express cách đọc JSON mà Postman/Frontend sẽ gửi lên
+// (Rất quan trọng! Nếu không có dòng này, req.body sẽ là 'undefined')
 app.use(express.json());
 
-// 3. ĐỊNH NGHĨA ROUTES (ĐƯỜNG DẪN)
-app.get('/hello', (req, res) => 
-{
-  res.json({message: "hello backend! CSDL đã kết nối!"});
+
+// --- BƯỚC 3: ĐỊNH NGHĨA ROUTES (ĐƯỜNG DẪN) ---
+
+// (Bạn vẫn có thể giữ lại route "Hello World" cũ để test server)
+app.get('/hello', (req, res) => {
+  res.json({ message: "Hello Backend! Chào mừng đến với Giai đoạn 2!" });
 });
-// Sử dụng Auth Routes
+
+// Dòng này sẽ kết nối các API Đăng ký/Đăng nhập của bạn
+// Express sẽ tự động nối:
+// /api/auth + /register => /api/auth/register
+// /api/auth + /login    => /api/auth/login
 app.use('/api/auth', authRoutes);
 
-// 4. KHỞI ĐỘNG SERVER
+
+// --- BƯỚC 4: KHỞI ĐỘNG SERVER VÀ KIỂM TRA CSDL ---
 app.listen(PORT, async () => {
-  console.log('Server đang chạy tại http://localhost:${PORT}');
-  await testConnection();
+  console.log(`Server đang chạy tại http://localhost:${PORT}`);
+  
+  // Gọi hàm testConnection() từ file database.js
+  try {
+    await testConnection();
+  } catch (error) {
+    console.error("LỖI KHỞI ĐỘNG: Không thể kết nối CSDL, server đang tắt.");
+    process.exit(1); // Tắt server nếu không kết nối được CSDL
+  }
 });
