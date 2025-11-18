@@ -9,6 +9,10 @@ const express = require('express');
 // Import file routes bạn vừa tạo
 const authRoutes = require('./src/routes/auth.route'); 
 
+const userRoutes = require('./src/routes/user.route');
+
+const clubRoutes = require('./src/routes/club.route');
+
 // --- BƯỚC 2: CẤU HÌNH ỨNG DỤNG (APP) ---
 const app = express();
 const PORT = 3000;
@@ -32,6 +36,11 @@ app.get('/hello', (req, res) => {
 // /api/auth + /login    => /api/auth/login
 app.use('/api/auth', authRoutes);
 
+// Sử dụng User Routes
+app.use('/api/users', userRoutes);
+
+// Sử dụng Club Routes
+app.use('/api/clubs', clubRoutes);
 
 // --- BƯỚC 4: KHỞI ĐỘNG SERVER VÀ KIỂM TRA CSDL ---
 app.listen(PORT, async () => {
