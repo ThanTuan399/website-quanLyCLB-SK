@@ -1,0 +1,93 @@
+// Bài Test A: Đăng ký Tài khoản mới
+// Phương thức: POST
+
+// URL: http://localhost:3000/api/auth/register
+
+// Chọn tab Body -> chọn raw -> chọn JSON.
+
+// Dán nội dung JSON sau vào ô Body (Đây là dữ liệu bạn gửi lên server):
+// {
+//     "hoTen": "Sinh Viên Test A",
+//     "email": "student_a@test.com",
+//     "matKhau": "password123",
+//     "mssv": "SV001",
+//     "vaiTro": "STUDENT"
+// }
+// Nhấn nút Send.
+
+// Kết quả Cần đạt: Bạn phải nhận được Status 201 Created và nội dung:
+
+// JSON
+
+// {
+//     "message": "Tạo tài khoản thành công!",
+//     "userId": 4 
+// }
+// (Con số userId có thể khác, tùy vào dữ liệu mẫu bạn đã có).
+// Bài Test B: Đăng nhập
+// Phương thức: POST
+
+// URL: http://localhost:3000/api/auth/login
+
+// Chọn tab Body -> raw -> JSON.
+
+// Dán nội dung JSON sau (dùng tài khoản bạn vừa tạo ở Test A):
+
+// JSON
+
+// {
+//     "email": "student_a@test.com",
+//     "matKhau": "password123"
+// }
+// Nhấn nút Send.
+
+// Kết quả Cần đạt: Bạn phải nhận được Status 200 OK và một token (một chuỗi ký tự rất dài), ví dụ:
+
+// JSON
+
+// {
+//     "message": "Đăng nhập thành công!",
+//     "token": "eyJhbGciOiJI... (một chuỗi rất dài) ...",
+//     "user": {
+//         "userId": 4,
+//         "email": "student_a@test.com",
+//         "vaiTro": "STUDENT"
+//     }
+// }
+// Bước 3: Test Cập nhật hồ sơ (PUT)
+
+// Tạo request mới: PUT http://localhost:3000/api/users/profile
+
+// Vẫn cài đặt Authorization như trên.
+
+// Sang tab Body -> raw -> JSON, nhập thông tin muốn sửa:
+
+// JSON
+
+// {
+//   "hoTen": "Tên Mới Của Tôi",
+//   "avatarUrl": "https://example.com/anh-moi.jpg"
+// }
+// Nhấn Send.
+
+// Kết quả mong đợi: Thông báo thành công và thông tin user đã được cập nhật.
+
+### Hướng dẫn Kiểm thử (Test Plan cho Bước 2.3)
+
+Sau khi lưu tất cả các file, hãy restart server và mở Postman:
+
+1.  **Lấy danh sách CLB:**
+    * `GET http://localhost:3000/api/clubs`
+    * Kết quả: Danh sách các CLB (bạn đã tạo CLB Guitar ở phần SQL script).
+
+2.  **Đăng ký tham gia CLB:**
+    * `POST http://localhost:3000/api/clubs/1/join`
+    * **Auth:** Bearer Token (Dùng token của user sinh viên).
+    * Kết quả: "Đã gửi yêu cầu tham gia thành công!".
+
+3.  **Xem danh sách thành viên:**
+    * `GET http://localhost:3000/api/clubs/1/members`
+    * **Auth:** Bearer Token.
+    * Kết quả: Danh sách user kèm trạng thái (`dang_cho_duyet` hoặc `da_tham_gia`).
+
+Hãy thực hiện và cho tôi biết kết quả nhé!
