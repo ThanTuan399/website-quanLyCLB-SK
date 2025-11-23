@@ -13,6 +13,8 @@ const userRoutes = require('./src/routes/user.route');
 
 const clubRoutes = require('./src/routes/club.route');
 
+const cors = require('cors');
+
 // --- BƯỚC 2: CẤU HÌNH ỨNG DỤNG (APP) ---
 const app = express();
 const PORT = 3000;
@@ -22,7 +24,7 @@ const PORT = 3000;
 // (Rất quan trọng! Nếu không có dòng này, req.body sẽ là 'undefined')
 app.use(express.json());
 
-
+app.use(cors());
 // --- BƯỚC 3: ĐỊNH NGHĨA ROUTES (ĐƯỜNG DẪN) ---
 
 // (Bạn vẫn có thể giữ lại route "Hello World" cũ để test server)
