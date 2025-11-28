@@ -1,15 +1,19 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import eventService from '../services/event.service';
+import { useContext } from 'react'; 
+import { AuthContext } from '../context/AuthContext';
 
 const EventDetailPage = () => 
 {
   const { id } = useParams(); // Lấy ID từ URL
   const navigate = useNavigate();
+  const { user } = useContext(AuthContext); // Lấy user
   
   const [event, setEvent] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [registering, setRegistering] = useState(false); // State loading cho nút đăng ký
 
   useEffect(() => 
     {
@@ -30,13 +34,36 @@ const EventDetailPage = () =>
             }
         };
     fetchEventDetail();
-  }, [id]);
-
-  if (loading) return <div className="text-center py-20">Đang tải thông tin...</div>;
-  if (error) return <div className="text-center py-20 text-red-500">{error}</div>;
-  if (!event) return null;
+    }, 
+        [id]);
+        if (loading) return <div className="text-center py-20">Đang tải thông tin...</div>;
+        if (error) return <div className="text-center py-20 text-red-500">{error}</div>;
+        if (!event) return null;
 
   const isFull = event.soLuongDaDangKy >= event.soLuongToiDa;
+
+  // Hàm xử lý Đăng ký MỚI
+  const handleRegister = async () => {
+    if (!user) {
+      alert("Bạn cần đăng nhập để đăng ký!");
+      navigate('/login');
+      return;
+    }
+
+    if (!window.confirm(`Bạn có chắc muốn đăng ký sự kiện "${event.tenSuKien}"?`)) return;
+
+    setRegistering(true);
+    try {
+      await eventService.registerEvent(event.eventId); // Gọi API thật
+      alert("Đăng ký thành công!");
+      // Tải lại thông tin sự kiện để cập nhật số lượng chỗ
+      // fetchEventDetail(); 
+    } catch (error) {
+      alert(error.response?.data?.message || "Đăng ký thất bại. Có thể bạn đã đăng ký rồi.");
+    } finally {
+      setRegistering(false);
+    }
+  };
 
   return (
     <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-lg overflow-hidden">
@@ -78,6 +105,15 @@ const EventDetailPage = () =>
               {event.soLuongDaDangKy} / {event.soLuongToiDa} người
             </div>
           </div>
+
+        //Cập nhật nút bấm trong phần return:
+        <button 
+            disabled={isFull || registering}
+            className={`... ${registering ? 'opacity-50' : ''}`} // Thêm style khi đang loading
+            onClick={handleRegister} // Thay thế hàm alert cũ bằng handleRegister
+        >
+            {registering ? 'Đang xử lý...' : (isFull ? 'Sự kiện đã đầy' : 'Đăng Ký Tham Gia Ngay')}
+        </button>
 
           {/* Nút hành động */}
           <div className="flex flex-col justify-center">

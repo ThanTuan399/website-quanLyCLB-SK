@@ -5,8 +5,14 @@ const eventService =
   // Lấy danh sách tất cả sự kiện
   getAllEvents: async () => 
     {
-      return [
-      {
+      try {
+      const response = await api.get('/events');
+      return response.data;
+    } catch (error) {
+      console.warn("Chưa kết nối được API Events, dùng dữ liệu giả...");
+      // Nếu lỗi (do BE chưa xong), trả về dữ liệu giả cũ (giữ nguyên code mock cũ của bạn ở đây)
+      return [ /* 
+        {
         eventId: 1,
         tenSuKien: "Đêm nhạc Acoustic Mùa Thu",
         moTa: "Một đêm nhạc ấm cúng...",
@@ -28,7 +34,10 @@ const eventService =
         soLuongDaDangKy: 30, // Test trường hợp "Hết chỗ"
         Club: { tenCLB: "CLB IT" }
       }
-      ];
+        */ ];
+    }
+      
+
     // const response = await api.get('/events');
     // return response.data;
     },
@@ -36,10 +45,21 @@ const eventService =
   // Lấy chi tiết một sự kiện (sẽ dùng ở bước sau)
     getEventById: async (id) => 
     {
+      // Tương tự, thử gọi API thật
+    try 
+    {
+      const response = await api.get(`/events/${id}`);
+      return response.data;
+    } 
+
+      catch (error) 
+      {
+        /*
       // Giả lập độ trễ mạng
       await new Promise(resolve => setTimeout(resolve, 500));
       //const response = await api.get(`/events/${id}`);
       //return response.data;
+
       const mockEvents = [
         {
           eventId: 1,
@@ -64,7 +84,21 @@ const eventService =
           Club: { tenCLB: "CLB IT", logoUrl: "https://via.placeholder.com/50" }
         }
       ];
+      */
+        throw error;
+      }
 
+    },
+
+    // --- HÀM MỚI: Đăng ký tham gia ---
+    registerEvent: async (eventId) => 
+    {
+    // Gọi API POST /api/events/:id/register
+    const response = await api.post(`/events/${eventId}/register`);
+    return response.data;
+    }
+    
+      /*
       // Tìm kiếm trong mảng giả
       const event = mockEvents.find(e => e.eventId === parseInt(id));
       
@@ -72,6 +106,7 @@ const eventService =
       
       return event;  
     }
+      */
 };
 
 

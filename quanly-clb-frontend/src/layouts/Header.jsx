@@ -24,6 +24,18 @@ const Header = () => {
           <Link to="/" className="hover:text-blue-200 transition">Trang chủ</Link>
           <Link to="/events" className="hover:text-blue-200 transition">Sự kiện</Link>
           
+          {/* --- 👇 ĐÂY LÀ PHẦN QUAN TRỌNG MỚI THÊM --- */}
+          {/* Chỉ hiển thị nút này nếu user là ADMIN hoặc MANAGER */}
+          {user && (user.vaiTro === 'ADMIN' || user.vaiTro === 'MANAGER') && (
+            <Link 
+              to="/admin/dashboard" 
+              className="bg-yellow-400 text-blue-900 px-3 py-1 rounded font-bold hover:bg-yellow-300 transition shadow-sm"
+            >
+              ⚙️ Trang Quản Trị
+            </Link>
+          )}
+          {/* ------------------------------------------ */}
+
           {/* Khu vực hiển thị thông tin User */}
           {user ? (
             <div className="flex items-center gap-4">
